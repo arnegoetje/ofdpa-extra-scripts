@@ -51,37 +51,37 @@ def main():
         l2InterfaceGroupId1_p = new_uint32_tp()
         rc = installL2InterfaceGroup(tunnel1_vlan, fabric_port1, l2InterfaceGroupId1_p)
         if rc != OFDPA_E_NONE:
-            print "Installation of L2 interface group failed. rc = %d" %(rc)
+            print "Installation of L2 interface group for Tunnel 1 failed. rc = %d" %(rc)
             return
 
         l2InterfaceGroupId2_p = new_uint32_tp()
         rc = installL2InterfaceGroup(tunnel2_vlan, fabric_port2, l2InterfaceGroupId2_p)
         if rc != OFDPA_E_NONE:
-            print "Installation of L2 interface group failed. rc = %d" %(rc)
+            print "Installation of L2 interface group for Tunnel 2 failed. rc = %d" %(rc)
             return
 
         mplsInterfaceGroupId1_p = new_uint32_tp()
         rc = installMplsInterfaceGroup(0, uint32_tp_value(l2InterfaceGroupId1_p), tunnel1_vlan, my_mac, destination1_mac, mplsInterfaceGroupId1_p)
         if rc != OFDPA_E_NONE:
-            print "Installation of MPLS interface group failed. rc = %d" %(rc)
+            print "Installation of MPLS interface group for Tunnel 1 failed. rc = %d" %(rc)
             return
 
         mplsInterfaceGroupId2_p = new_uint32_tp()
         rc = installMplsInterfaceGroup(0, uint32_tp_value(l2InterfaceGroupId2_p), tunnel2_vlan, my_mac, destination2_mac, mplsInterfaceGroupId2_p)
         if rc != OFDPA_E_NONE:
-            print "Installation of MPLS interface group failed. rc = %d" %(rc)
+            print "Installation of MPLS interface group for Tunnel 2 failed. rc = %d" %(rc)
             return
 
         mplsTunnelLabelGroupId1_p = new_uint32_tp()
         rc = installMplsLabelGroup(0, uint32_tp_value(mplsInterfaceGroupId1_p), BOS_FALSE, tunnel1_label_init, mplsTunnelLabelGroupId1_p, OFDPA_MPLS_TUNNEL_LABEL1)
         if rc != OFDPA_E_NONE:
-            print "Installation of MPLS tunnel label group failed. rc = %d" %(rc)
+            print "Installation of MPLS tunnel label group for Tunnel 1 failed. rc = %d" %(rc)
             return
 
         mplsTunnelLabelGroupId2_p = new_uint32_tp()
         rc = installMplsLabelGroup(0, uint32_tp_value(mplsInterfaceGroupId2_p), BOS_FALSE, tunnel2_label_init, mplsTunnelLabelGroupId2_p, OFDPA_MPLS_TUNNEL_LABEL1)
         if rc != OFDPA_E_NONE:
-            print "Installation of MPLS tunnel label group failed. rc = %d" %(rc)
+            print "Installation of MPLS tunnel label group for Tunnel 2 failed. rc = %d" %(rc)
             return
 
         # Set up MPLS ECMP group.  This configures the next hops in an ECMP group.
@@ -177,7 +177,7 @@ def main():
         vlanPortTermFlow.flowData.vlanFlowEntry.gotoTableId = OFDPA_FLOW_TABLE_ID_TERMINATION_MAC
         rc = ofdpaFlowAdd(vlanPortTermFlow)
         if rc != OFDPA_E_NONE:
-            print "Installation of vlan flow for MPLS L3 VPN termination flow failed. rc = %d" %(rc)
+            print "Installation of vlan flow for MPLS L3 VPN termination flow for Tunnel 1 failed. rc = %d" %(rc)
             return
 
         # vlan flow
@@ -186,7 +186,7 @@ def main():
         vlanPortTermFlow.flowData.vlanFlowEntry.gotoTableId = OFDPA_FLOW_TABLE_ID_TERMINATION_MAC
         rc = ofdpaFlowAdd(vlanPortTermFlow)
         if rc != OFDPA_E_NONE:
-            print "Installation of vlan flow for MPLS L3 VPN termination flow failed. rc = %d" %(rc)
+            print "Installation of vlan flow for MPLS L3 VPN termination flow for Tunnel 2 failed. rc = %d" %(rc)
             return
 
 #==============================================================================
@@ -212,7 +212,7 @@ def main():
 
         rc = ofdpaFlowAdd(termMacFlowEntry)
         if rc != OFDPA_E_NONE:
-          print "Unable to add Termination MAC flow entry. rc = %d " % (rc)
+          print "Unable to add Termination MAC flow entry for Tunnel 1. rc = %d " % (rc)
           return
 
         termMacFlowEntry = ofdpaFlowEntry_t()
@@ -226,7 +226,7 @@ def main():
 
         rc = ofdpaFlowAdd(termMacFlowEntry)
         if rc != OFDPA_E_NONE:
-          print "Unable to add Termination MAC flow entry. rc = %d " % (rc)
+          print "Unable to add Termination MAC flow entry for Tunnel 2. rc = %d " % (rc)
           return
 
         # mpls tunnel flow
@@ -235,7 +235,7 @@ def main():
         mplsFirstTerm1Flow.flowData.mplsFlowEntry.gotoTableId = OFDPA_FLOW_TABLE_ID_MPLS_2
         rc = ofdpaFlowAdd(mplsFirstTerm1Flow)
         if rc != OFDPA_E_NONE:
-            print "Installation of MPLS tunnel flow failed. rc = %d" %(rc)
+            print "Installation of MPLS tunnel flow for Tunnel 1 failed. rc = %d" %(rc)
             return
 
         # mpls tunnel flow
@@ -244,7 +244,7 @@ def main():
         mplsFirstTerm2Flow.flowData.mplsFlowEntry.gotoTableId = OFDPA_FLOW_TABLE_ID_MPLS_2
         rc = ofdpaFlowAdd(mplsFirstTerm2Flow)
         if rc != OFDPA_E_NONE:
-            print "Installation of MPLS tunnel flow failed. rc = %d" %(rc)
+            print "Installation of MPLS tunnel flow for Tunnel 2 failed. rc = %d" %(rc)
             return
 
         # mpls l3 vpn flow
