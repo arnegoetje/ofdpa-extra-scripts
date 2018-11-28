@@ -39,7 +39,7 @@ def main():
         my_mac                  = "c4:39:3a:f4:5b:da"   # My Mac Address
         destination1_mac        = "cc:37:ab:d0:d2:20"   # Spine1 MAC address
         destination2_mac        = "cc:37:ab:d0:d4:28"   # Spine2 MAC address
-        cust_mac                = ""    # Device that connects to cust_port MAC address
+        cust_mac                = "00:11:00:aa:bb:cc"   # Device that connects to cust_port MAC address
         vrf                     = 1                     # internal VRF (defaut 1)
         source_ip               = 0xa0a00101            # Leaf1 (source) IP: 10.10.1.1
         dest_ip                 = 0xa0a00102            # Leaf2 (dest) IP: 10.10.1.2
