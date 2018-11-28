@@ -28,7 +28,8 @@ def main():
         fabric_port1            = 49                    # fabric port 1 to Spine1
         fabric_port2            = 50                    # fabric port 2 to Spine2
         cust_vlan               = 80                    # tagged traffic entering the leaf switch (S-tag)
-        fabric_vlan             = 4094                  # fabric internal VLAN ID
+        tunnel1_vlan             = 4090                 # Tunnel 1 internal VLAN ID
+        tunnel2_vlan             = 4091                 # Tunnel 2 internal VLAN ID
         vpn_label_init          = 0x12                  # VPN (inner MPLS) label from Leaf1 to Leaf2
         tunnel1_label_init      = 0x112a                # Tunnel (outer MPLS) label from Leaf1 to Spine1
         tunnel2_label_init      = 0x122a                # Tunnel (outer MPLS) label from Leaf1 to Spine2
@@ -40,7 +41,7 @@ def main():
         destination2_mac        = "cc:37:ab:d0:d4:28"   # Spine2 MAC address
         cust_mac                = ""    # Device that connects to cust_port MAC address
         vrf                     = 1                     # internal VRF (defaut 1)
-        source_ip               = 0xa0a00101            # Leaf1 (source) IP: 10.10.1.1  
+        source_ip               = 0xa0a00101            # Leaf1 (source) IP: 10.10.1.1
         dest_ip                 = 0xa0a00102            # Leaf2 (dest) IP: 10.10.1.2
         BOS_FALSE               = 0
         BOS_TRUE                = 1
@@ -48,25 +49,25 @@ def main():
     # MPLS L3 VPN initiation flows
         # install groups
         l2InterfaceGroupId1_p = new_uint32_tp()
-        rc = installL2InterfaceGroup(fabric_vlan, fabric_port1, l2InterfaceGroupId1_p)
+        rc = installL2InterfaceGroup(tunnel1_vlan, fabric_port1, l2InterfaceGroupId1_p)
         if rc != OFDPA_E_NONE:
             print "Installation of L2 interface group failed. rc = %d" %(rc)
             return
 
         l2InterfaceGroupId2_p = new_uint32_tp()
-        rc = installL2InterfaceGroup(fabric_vlan, fabric_port2, l2InterfaceGroupId2_p)
+        rc = installL2InterfaceGroup(tunnel2_vlan, fabric_port2, l2InterfaceGroupId2_p)
         if rc != OFDPA_E_NONE:
             print "Installation of L2 interface group failed. rc = %d" %(rc)
             return
 
         mplsInterfaceGroupId1_p = new_uint32_tp()
-        rc = installMplsInterfaceGroup(0, uint32_tp_value(l2InterfaceGroupId1_p), fabric_vlan, my_mac, destination1_mac, mplsInterfaceGroupId1_p)
+        rc = installMplsInterfaceGroup(0, uint32_tp_value(l2InterfaceGroupId1_p), tunnel1_vlan, my_mac, destination1_mac, mplsInterfaceGroupId1_p)
         if rc != OFDPA_E_NONE:
             print "Installation of MPLS interface group failed. rc = %d" %(rc)
             return
 
         mplsInterfaceGroupId2_p = new_uint32_tp()
-        rc = installMplsInterfaceGroup(0, uint32_tp_value(l2InterfaceGroupId2_p), fabric_vlan, my_mac, destination2_mac, mplsInterfaceGroupId2_p)
+        rc = installMplsInterfaceGroup(0, uint32_tp_value(l2InterfaceGroupId2_p), tunnel2_vlan, my_mac, destination2_mac, mplsInterfaceGroupId2_p)
         if rc != OFDPA_E_NONE:
             print "Installation of MPLS interface group failed. rc = %d" %(rc)
             return
@@ -172,7 +173,7 @@ def main():
 
         # vlan flow
         vlanPortTermFlow = ofdpaFlowEntry_t()
-        initializeVlanFlow(fabric_port1, fabric_vlan, vlanPortTermFlow)
+        initializeVlanFlow(fabric_port1, tunnel1_vlan, vlanPortTermFlow)
         vlanPortTermFlow.flowData.vlanFlowEntry.gotoTableId = OFDPA_FLOW_TABLE_ID_TERMINATION_MAC
         rc = ofdpaFlowAdd(vlanPortTermFlow)
         if rc != OFDPA_E_NONE:
@@ -181,7 +182,7 @@ def main():
 
         # vlan flow
         vlanPortTermFlow = ofdpaFlowEntry_t()
-        initializeVlanFlow(fabric_port2, fabric_vlan, vlanPortTermFlow)
+        initializeVlanFlow(fabric_port2, tunnel2_vlan, vlanPortTermFlow)
         vlanPortTermFlow.flowData.vlanFlowEntry.gotoTableId = OFDPA_FLOW_TABLE_ID_TERMINATION_MAC
         rc = ofdpaFlowAdd(vlanPortTermFlow)
         if rc != OFDPA_E_NONE:
@@ -191,7 +192,7 @@ def main():
 #==============================================================================
 #         # termination mac flow
 #         terminationMacTermFlow = ofdpaFlowEntry_t()
-#         initializeTermMacFlow(net_port, fabric_vlan, my_mac, 0x8847, terminationMacTermFlow)
+#         initializeTermMacFlow(net_port, tunnel1_vlan, my_mac, 0x8847, terminationMacTermFlow)
 #         terminationMacTermFlow.flowData.terminationMacFlowEntry.gotoTableId = OFDPA_FLOW_TABLE_ID_MPLS_0
 #         rc = ofdpaFlowAdd(terminationMacTermFlow)
 #         if rc != OFDPA_E_NONE:
@@ -203,7 +204,21 @@ def main():
         termMacFlowEntry = ofdpaFlowEntry_t()
         ofdpaFlowEntryInit(OFDPA_FLOW_TABLE_ID_TERMINATION_MAC, termMacFlowEntry)
         termMacFlowEntry.flowData.terminationMacFlowEntry.gotoTableId = OFDPA_FLOW_TABLE_ID_MPLS_0
-        termMacFlowEntry.flowData.terminationMacFlowEntry.match_criteria.vlanId = (OFDPA_VID_PRESENT | fabric_vlan)
+        termMacFlowEntry.flowData.terminationMacFlowEntry.match_criteria.vlanId = (OFDPA_VID_PRESENT | tunnel1_vlan)
+        termMacFlowEntry.flowData.terminationMacFlowEntry.match_criteria.vlanIdMask = (OFDPA_VID_PRESENT | OFDPA_VID_EXACT_MASK)
+        termMacFlowEntry.flowData.terminationMacFlowEntry.match_criteria.etherType = 0x8847
+        MACAddress_set(termMacFlowEntry.flowData.terminationMacFlowEntry.match_criteria.destMac, localMacAddress)
+        MACAddress_set(termMacFlowEntry.flowData.terminationMacFlowEntry.match_criteria.destMacMask, "ff:ff:ff:ff:ff:ff")
+
+        rc = ofdpaFlowAdd(termMacFlowEntry)
+        if rc != OFDPA_E_NONE:
+          print "Unable to add Termination MAC flow entry. rc = %d " % (rc)
+          return
+
+        termMacFlowEntry = ofdpaFlowEntry_t()
+        ofdpaFlowEntryInit(OFDPA_FLOW_TABLE_ID_TERMINATION_MAC, termMacFlowEntry)
+        termMacFlowEntry.flowData.terminationMacFlowEntry.gotoTableId = OFDPA_FLOW_TABLE_ID_MPLS_0
+        termMacFlowEntry.flowData.terminationMacFlowEntry.match_criteria.vlanId = (OFDPA_VID_PRESENT | tunnel2_vlan)
         termMacFlowEntry.flowData.terminationMacFlowEntry.match_criteria.vlanIdMask = (OFDPA_VID_PRESENT | OFDPA_VID_EXACT_MASK)
         termMacFlowEntry.flowData.terminationMacFlowEntry.match_criteria.etherType = 0x8847
         MACAddress_set(termMacFlowEntry.flowData.terminationMacFlowEntry.match_criteria.destMac, localMacAddress)
