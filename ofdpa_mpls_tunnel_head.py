@@ -67,7 +67,7 @@ def main():
             return
 
         mplsInterfaceGroupId2_p = new_uint32_tp()
-        rc = installMplsInterfaceGroup(0, uint32_tp_value(l2InterfaceGroupId2_p), tunnel2_vlan, my_mac, destination2_mac, mplsInterfaceGroupId2_p)
+        rc = installMplsInterfaceGroup(1, uint32_tp_value(l2InterfaceGroupId2_p), tunnel2_vlan, my_mac, destination2_mac, mplsInterfaceGroupId2_p)
         if rc != OFDPA_E_NONE:
             print "Installation of MPLS interface group for Tunnel 2 failed. rc = %d" %(rc)
             return
