@@ -79,7 +79,7 @@ def main():
             return
 
         mplsTunnelLabelGroupId2_p = new_uint32_tp()
-        rc = installMplsLabelGroup(0, uint32_tp_value(mplsInterfaceGroupId2_p), BOS_FALSE, tunnel2_label_init, mplsTunnelLabelGroupId2_p, OFDPA_MPLS_TUNNEL_LABEL1)
+        rc = installMplsLabelGroup(1, uint32_tp_value(mplsInterfaceGroupId2_p), BOS_FALSE, tunnel2_label_init, mplsTunnelLabelGroupId2_p, OFDPA_MPLS_TUNNEL_LABEL1)
         if rc != OFDPA_E_NONE:
             print "Installation of MPLS tunnel label group for Tunnel 2 failed. rc = %d" %(rc)
             return
