@@ -98,12 +98,12 @@ def main():
         mplsECMPGroupBucket1 = ofdpaGroupBucketEntry_t()
         mplsECMPGroupBucket1.groupId = mplsECMPGroupEntry.groupId
         mplsECMPGroupBucket1.bucketIndex = 0
-        mplsECMPGroupBucket1.referenceGroupId = uint32_tp_value(mplsTunnelLabelGroupId1)
+        mplsECMPGroupBucket1.referenceGroupId = uint32_tp_value(mplsTunnelLabelGroupId1_p)
 
         mplsECMPGroupBucket2 = ofdpaGroupBucketEntry_t()
         mplsECMPGroupBucket2.groupId = mplsECMPGroupEntry.groupId
         mplsECMPGroupBucket2.bucketIndex = 1
-        mplsECMPGroupBucket2.referenceGroupId = uint32_tp_value(mplsTunnelLabelGroupId2)
+        mplsECMPGroupBucket2.referenceGroupId = uint32_tp_value(mplsTunnelLabelGroupId2_p)
 
         rc = ofdpaGroupAdd(mplsECMPGroupEntry)
         if rc != OFDPA_E_NONE:
