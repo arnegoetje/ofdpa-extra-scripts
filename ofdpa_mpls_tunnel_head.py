@@ -90,7 +90,7 @@ def main():
 
         ofdpaGroupTypeSet(mplsECMPGroupId, OFDPA_GROUP_ENTRY_TYPE_MPLS_FORWARDING)
         ofdpaGroupMplsSubTypeSet(mplsECMPGroupId, OFDPA_MPLS_ECMP)
-        ofdpaGroupIndexSet(mplsECMPGroupId, index1)
+        ofdpaGroupIndexSet(mplsECMPGroupId, 1)
 
         mplsECMPGroupEntry  = ofdpaGroupEntry_t()
         mplsECMPGroupEntry.groupId = uint32_tp_value(mplsECMPGroupId)
